@@ -1,60 +1,59 @@
-select genre.name, count(executor.name) from executor
+select genres.name, count(executor.name) from executor
 join genreexecutor on executor.id = genreexecutor.executor_id
-join genre on genre.id = genreexecutor.genres_id
-group by genre.name
+join genres on genres.id = genreexecutor.genres_id
+group by genres.name
 order by count(executor.name) desc
 
-select album.name, count(track.name) from track
-join album on album.id = track.album_id
-where album.yearofissue  >= 2019 and album.yearofissue  <= 2020
-group by album.name
-order by count(track.name) desc
+select tracks.name, albums.yearofissue
+from albums as albums
+join tracks as tracks on tracks.albums_id = albums.id
+where (albums.yearofissue >= 2001) and (albums.yearofissue <= 2020)
 
-select album.name, avg(track.duration) from track
-join album on album.id = tracks.album_id
-group by album.name
-order by avg(track.duration) desc
+select albums.name, avg(tracks.duration) from tracks
+join albums on albums.id = tracks.albums_id
+group by albums.name
+order by avg(tracks.duration) desc
 
 select executor.name from executor
 where executor.name not in (select executor.name from executor 
-join executoralbum on executor.id = executoralbum.executor_id
-join album on executoralbum.album_id = album.id
-where (album.yearofissue = 2020))
+join executoralbums on executor.id = executoralbums.executor_id
+join albums on executoralbums.albums_id = albums.id
+where (albums.yearofissue = 2020))
 
-select distinct collection.name from collection
-join collectiontrack on collection.id = collectiontrack.collection_id
-join track on track.id = collectiontrack.track_id 
-join album on album.id = track.album_id
-join executoralbums on album.id = executoralbum.albums_id 
-join executor on executor.id = executoralbum.executor_id
+select distinct collections.name from collections
+join collectionstracks on collections.id = collectionstracks.collections_id
+join tracks on tracks.id = collectionstracks.tracks_id 
+join albums on albums.id = tracks.albums_id
+join executoralbums on albums.id = executoralbums.albums_id 
+join executor on executor.id = executoralbums.executor_id
 where executor.name like '%Король и Шут%'
 
-select album.name from executor 
-join genreexecutor on executor.id = genreexecutor.executor_id
-join genre on genre.id = genreexecutor.genres_id
-join executoralbum on executor.id = executoralbum.executor_id
-join album on album.id = executoralbum.albums_id
-group by album.name, executor.name
-having count(genre.name) > 1
-order by count(genre.name) desc
+select albums.name from executor    ---------
+join genresexecutor on executor.id = genresexecutor.executor_id
+join genres on genres.id = genresexecutor.genres_id
+join executoralbums on executor.id = executoralbums.executor_id
+join albums on albums.id = executoralbums.albums_id
+group by albums.name, executor.name
+having count(genres.name) > 1
+order by count(genres.name) desc    ----------
 
-select track.name from collection
-full join collectiontrack on collection.id = collectiontrack.collection_id
-full join track on track.id = collectiontrack.track_id
-where collection.name is null
+select tracks.name from collections
+full join collectionstracks on collections.id = collectionstracks.collections_id
+full join tracks on tracks.id = collectionstracks.tracks_id
+where collections.name is null
 
-select executor.name, track.duration from track
-join album on track.album_id = album.id
-join executoralbum on album.id = executoralbum.albums_id 
-join executor on executor.id = executoralbum.executor_id
-where track.duration = (select min(track.duration) from track)
-order by track.duration
+select executor.name, tracks.duration from tracks       ----------------
+join albums on tracks.albums_id = albums.id
+join executoralbums on albums.id = executoralbum.albums_id 
+join executor on executor.id = executoralbums.executor_id
+where tracks.duration = (select min(tracks.duration) from tracks)
+order by tracks.duration                                            -------------------
 
-select album.name from album
-join track on track.album_id = album.id 
-group by album.name
-having count(track.name) = (select count(track.name) from track 
-join album on album.id = track.album_id
-group by albu.name
-order by count(track.name) limit 1)
-order by count(track.name)
+select albums.name from albums
+join tracks on tracks.albums_id = albums.id 
+group by albums.name
+having count(tracks.name) = (select count(tracks.name) from tracks
+join albums on albums.id = tracks.albums_id
+group by albums.name
+order by count(tracks.name) limit 1)
+order by count(tracks.name)
