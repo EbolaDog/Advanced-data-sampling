@@ -17,7 +17,7 @@ create table if not exists GenreExecutor (
 create table if not exists Albums (
 	id SERIAL primary key,
 	name text not null,
-	exityear integer not null
+	yearofissue integer not null
 );
 
 create table if not exists ExecutorAlbums (
@@ -36,7 +36,7 @@ create table if not exists Tracks (
 create table if not exists Collections (
 	id SERIAL primary key,
 	name text not null,
-	exityear integer not null
+	yearofissue integer not null
 );
 
 create table if not exists CollectionsTracks (
